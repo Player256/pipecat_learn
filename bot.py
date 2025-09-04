@@ -13,12 +13,17 @@ from pipecat.processors.aggregators.openai_llm_context import OpenAILLMContext
 from pipecat.transports.base_transport import TransportParams
 from pipecat.transports.network.small_webrtc import SmallWebRTCTransport
 from pipecat.audio.vad.silero import SileroVADAnalyzer
+from pipecat.observers.loggers.user_bot_latency_log_observer import (
+    UserBotLatencyLogObserver,
+)
+
 
 load_dotenv(override=True)
 
 
 async def run_example(webrtc_connection):
     logger.info(f"Starting bot")
+    latency_observer = UserBotLatencyLogObserver()
 
     transport = SmallWebRTCTransport(
         webrtc_connection=webrtc_connection,
@@ -61,8 +66,9 @@ async def run_example(webrtc_connection):
                 tts,
                 transport.output(),
                 context_aggregator.assistant(),
-            ]
+            ],
         )
+        
 
         task = PipelineTask(
             pipeline,
